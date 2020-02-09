@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { updateUser } from './actions/user-actions';
+import { updateUser, apiRequest } from './actions/user-actions';
+
+import { createSelector } from 'reselect';
 
 class App extends Component  {
 
@@ -13,12 +16,17 @@ class App extends Component  {
     this.onUpdateUser = this.onUpdateUser.bind(this);
   }
 
+  // componentDidMount() {
+  //   setTimeout(() => {
+  //     this.props.onApiRequest();
+  //   }, 1500);
+  // }
+
   onUpdateUser(event) {
     this.props.onUpdateUser(event.target.value);
   }
 
   render() {
-    console.log(this.props)
     return (
       <div className="App">
         <input onChange={this.onUpdateUser} />
@@ -28,13 +36,28 @@ class App extends Component  {
   }
 }
 
-const mapStateToProps = state => ({
-  products: state.products,
-  user: state.user
-});
+const productsSelector = createSelector(
+  state => state.products,
+  products => products
+)
+
+const userSelector = createSelector(
+  state => state.user,
+  user => user
+)
+
+const mapStateToProps = createSelector(
+  productsSelector,
+  userSelector,
+  (products, user) => ({
+    products,
+    user
+  })
+)
 
 const mapActionsToProps = {
-  onUpdateUser: updateUser
-}
+  onUpdateUser: updateUser,
+  onApiRequest: apiRequest
+};
 
 export default connect(mapStateToProps, mapActionsToProps)(App);
